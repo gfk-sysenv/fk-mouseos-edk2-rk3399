@@ -13,18 +13,6 @@
 #define MHz 1000000
 #define KHz 1000
 
-typedef enum rk3399_pll_id {
-  APLLL_ID = 0,
-  APLLB_ID,
-  DPLL_ID,
-  CPLL_ID,
-  GPLL_ID,
-  NPLL_ID,
-  VPLL_ID,
-  PPLL_ID,
-  END_PLL_ID
-} rk3399_pll_id;
-
 typedef enum apll_frequencies {
   APLL_1600_MHZ,
   APLL_816_MHZ,
@@ -50,7 +38,7 @@ rk3399_clock_init(
 
 UINT32
 rk3399_pll_get_rate(
-  IN  rk3399_pll_id pll_id
+  IN  UINTN id
   );
 
 void
@@ -59,7 +47,13 @@ rk3399_configure_cpu(
   IN  cpu_cluster cluster
   );
 
+
+UINT32 rk3399_vop_set_clk(UINT32 clk_id, UINT32 hz);
+void rk3399_vio_set_clk(UINT32 hz);
+void rk3399_hdcp_set_clk(UINT32 hz);
+
 /* core clocks */
+#define PLL_PPLL        0
 #define PLL_APLLL       1
 #define PLL_APLLB       2
 #define PLL_DPLL        3

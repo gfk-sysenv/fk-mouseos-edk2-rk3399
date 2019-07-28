@@ -437,6 +437,11 @@
   Platform/Rockchip/Rk3399Pkg/AcpiTables/AcpiTables.inf
 
   #
+  # Video.
+  #
+  Platform/Rockchip/Rk3399Pkg/Drivers/VopDxe/VopDxe.inf
+
+  #
   # Bds
   #
   MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf

@@ -199,6 +199,11 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/Acpi/AcpiPlatformDxe/AcpiPlatformDxe.inf
   INF RuleOverride = ACPITABLE Platform/Rockchip/Rk3399Pkg/AcpiTables/AcpiTables.inf
 
+  #
+  # Video.
+  #
+  INF Platform/Rockchip/Rk3399Pkg/Drivers/VopDxe/VopDxe.inf
+
 [FV.FVMAIN_COMPACT]
 FvAlignment        = 8
 ERASE_POLARITY     = 1

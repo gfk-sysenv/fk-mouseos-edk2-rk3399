@@ -121,4 +121,13 @@
 #define GRF_SIG_DETECT_CLR	0xe3d0
 #define GRF_SIG_DETECT_STATUS	0xe3e0
 
+/* GRF_SOC_CON20 */
+#define GRF_DSI0_VOP_SEL_SHIFT       (0)
+#define GRF_DSI0_VOP_SEL_MASK        (1 << GRF_DSI0_VOP_SEL_SHIFT)
+#define GRF_DSI0_VOP_SEL_B           (0)
+#define GRF_DSI0_VOP_SEL_L           (1)
+#define GRF_RK3399_HDMI_VOP_SEL_MASK (1 << 6)
+#define GRF_RK3399_HDMI_VOP_SEL_B    (0 << 6)
+#define GRF_RK3399_HDMI_VOP_SEL_L    (1 << 6)
+
 #endif  //__RK3399_GRF_H__

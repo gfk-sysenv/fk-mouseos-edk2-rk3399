@@ -38,6 +38,9 @@
 #include <Library/I2CLib.h>
 #include <Rk808.h>
 
+#include <Rk3399/Rk3399.h>
+#include <Rk3399/Rk3399Grf.h>
+
 #define BCD2BIN(Val)	(((Val) & 0x0f) + ((Val) >> 4) * 10)
 #define BIN2BCD(Val)	((((Val) / 10) << 4) + (Val) % 10)
 
@@ -142,6 +145,7 @@ InitializeRk808 (
   VOID
   )
 {
+  UINT8 Ret;
   EFI_STATUS    Status;
 
   // Prepare the hardware
@@ -153,6 +157,36 @@ InitializeRk808 (
   Rk808I2CInit();
 
   mRk808Initialized = TRUE;
+
+  /*
+   * NanoPI/NanoPC-specific. Enable SW1/SW2.
+   */
+
+#define DUMP(x) do {                                            \
+    Status = Rk808I2CRead(x, 1, &Ret, 1);                       \
+    DEBUG((EFI_D_ERROR, "%r: " #x " = 0x%x\n", Status, Ret));   \
+  } while (0)
+
+  Status = Rk808I2CRead(RK808_DCDC_EN_REG, 1, &Ret, 1);
+  ASSERT_EFI_ERROR (Status);
+  Ret |= 1 << 5; // SW1
+  Ret |= 1 << 6; // SW2
+  Rk808I2CWrite(RK808_DCDC_EN_REG, 1, &Ret, 1);
+
+  DUMP(RK808_BUCK1_ON_VSEL_REG);
+  DUMP(RK808_BUCK2_ON_VSEL_REG);
+  DUMP(RK808_BUCK4_ON_VSEL_REG);
+  DUMP(RK808_DCDC_EN_REG);
+  DUMP(RK808_LDO_EN_REG);
+  DUMP(RK808_LDO1_ON_VSEL_REG);
+  DUMP(RK808_LDO2_ON_VSEL_REG);
+  DUMP(RK808_LDO3_ON_VSEL_REG);
+  DUMP(RK808_LDO4_ON_VSEL_REG);
+  DUMP(RK808_LDO5_ON_VSEL_REG);
+  DUMP(RK808_LDO6_ON_VSEL_REG);
+  DUMP(RK808_LDO7_ON_VSEL_REG);
+  DUMP(RK808_LDO8_ON_VSEL_REG);
+#undef DUMP
 
   EXIT:
   return Status;

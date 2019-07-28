@@ -55,6 +55,7 @@
 
 #define GrfReadl(offset)		MmioRead32(RK3399_GRF_BASE + offset)
 #define GrfWritel(v, offset)		do { MmioWrite32(RK3399_GRF_BASE + offset, v); } while (0)
+#define GrfClearSetl(offset, clear, set)	do { MmioAndThenOr32(RK3399_GRF_BASE + offset, ~(clear), set); } while (0)
 
 #define PmuGrfReadl(offset)		MmioRead32(RK3399_PMU_GRF_BASE + offset)
 #define PmuGrfWritel(v, offset)		do { MmioWrite32(RK3399_PMU_GRF_BASE + offset, v); } while (0)

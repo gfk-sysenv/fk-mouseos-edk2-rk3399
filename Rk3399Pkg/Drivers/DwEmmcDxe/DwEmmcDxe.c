@@ -755,7 +755,7 @@ DwEmmcIomux (
   MicroSecondDelay(5);
   CruWritel((0x1 << ( 10 + 16)) | (0 << 10), CRU_SOFTRSTS_CON(7));
 
-  PllRate = rk3399_pll_get_rate(GPLL_ID);
+  PllRate = rk3399_pll_get_rate(PLL_GPLL);
   DEBUG ((DW_DBG, "%a(): GPLL PllRate=%d\n", __func__, PllRate));
 
   if (PllRate == 800000000) {

@@ -18,8 +18,8 @@
 
 #define OSC_HZ          (24*MHz)
 #define GPLL_HZ         (800 * MHz)
-#define CPLL_HZ         (384*MHz)
-#define NPLL_HZ         (600 * MHz)
+#define CPLL_HZ         (800 * MHz)
+#define NPLL_HZ         (1000 * MHz)
 #define PPLL_HZ         (676*MHz)
 
 #define PMU_PCLK_HZ     (48*MHz)
@@ -276,13 +276,42 @@ enum {
   CLK_TSADC_DIV_CON_SHIFT        = 0,
   CLK_TSADC_DIV_CON_MASK         = 0x3ff,
 
+  /* CLKSEL_CON42 */
+  ACLK_HDCP_PLL_SEL_SHIFT        = 14,
+  ACLK_HDCP_PLL_SEL_MASK         = 0x3 << ACLK_HDCP_PLL_SEL_SHIFT,
+  ACLK_HDCP_PLL_SEL_CPLL         = 0x0,
+  ACLK_HDCP_PLL_SEL_GPLL         = 0x1,
+  ACLK_HDCP_PLL_SEL_PPLL         = 0x2,
+  ACLK_HDCP_DIV_CON_SHIFT        = 8,
+  ACLK_HDCP_DIV_CON_MASK         = 0x1f << ACLK_HDCP_DIV_CON_SHIFT,
+
+  ACLK_VIO_PLL_SEL_SHIFT        = 6,
+  ACLK_VIO_PLL_SEL_MASK         = 0x3 << ACLK_VIO_PLL_SEL_SHIFT,
+  ACLK_VIO_PLL_SEL_CPLL         = 0x0,
+  ACLK_VIO_PLL_SEL_GPLL         = 0x1,
+  ACLK_VIO_PLL_SEL_PPLL         = 0x2,
+  ACLK_VIO_DIV_CON_SHIFT        = 0,
+  ACLK_VIO_DIV_CON_MASK         = 0x1f << ACLK_VIO_DIV_CON_SHIFT,
+
+  /* CLKSEL_CON43 */
+  PCLK_HDCP_DIV_CON_SHIFT       = 10,
+  PCLK_HDCP_DIV_CON_MASK        = 0x1f << PCLK_HDCP_DIV_CON_SHIFT,
+  HCLK_HDCP_DIV_CON_SHIFT       = 5,
+  HCLK_HDCP_DIV_CON_MASK        = 0x1f << HCLK_HDCP_DIV_CON_SHIFT,
+  PCLK_VIO_DIV_CON_SHIFT        = 0,
+  PCLK_VIO_DIV_CON_MASK         = 0x1f << PCLK_VIO_DIV_CON_SHIFT,
+
   /* CLKSEL_CON47 & CLKSEL_CON48 */
   ACLK_VOP_PLL_SEL_SHIFT         = 6,
   ACLK_VOP_PLL_SEL_MASK          = 0x3 << ACLK_VOP_PLL_SEL_SHIFT,
+  ACLK_VOP_PLL_SEL_VPLL          = 0x0,
   ACLK_VOP_PLL_SEL_CPLL          = 0x1,
   ACLK_VOP_PLL_SEL_GPLL          = 0x2,
+  ACLK_VOP_PLL_SEL_NPLL          = 0x3,
   ACLK_VOP_DIV_CON_SHIFT         = 0,
   ACLK_VOP_DIV_CON_MASK          = 0x1f << ACLK_VOP_DIV_CON_SHIFT,
+  HCLK_VOP_DIV_CON_SHIFT         = 8,
+  HCLK_VOP_DIV_CON_MASK          = 0x1f << HCLK_VOP_DIV_CON_SHIFT,
 
   /* CLKSEL_CON49 & CLKSEL_CON50 */
   DCLK_VOP_DCLK_SEL_SHIFT        = 11,
@@ -294,6 +323,15 @@ enum {
   DCLK_VOP_PLL_SEL_CPLL          = 1,
   DCLK_VOP_DIV_CON_MASK          = 0xff,
   DCLK_VOP_DIV_CON_SHIFT         = 0,
+
+  /* CLKSEL_CON51 and CLKSEL_CON52 */
+  CLK_VOP_PWM_PLL_SEL_SHIFT     = 6,
+  CLK_VOP_PWM_PLL_SEL_MASK      = 1 << CLK_VOP_PWM_PLL_SEL_SHIFT,
+  CLK_VOP_PWM_PLL_SEL_VPLL      = 0,
+  CLK_VOP_PWM_PLL_SEL_CPLL      = 1,
+  CLK_VOP_PWM_PLL_SEL_GPLL      = 2,
+  CLK_VOP_PWM_DIV_CON_SHIFT     = 0,
+  CLK_VOP_PWM_DIV_CON_MASK      = 0x1f << CLK_VOP_PWM_DIV_CON_SHIFT,
 
   /* CLKSEL_CON57 */
   PCLK_ALIVE_DIV_CON_SHIFT      = 0,
@@ -419,12 +457,15 @@ rkclk_pll_get_rate(
 
 UINT32
 rk3399_pll_get_rate(
-  IN  rk3399_pll_id pll_id
+  IN  UINTN id
   )
 {
   UINT32 *pll_con;
-        
-  switch (pll_id) {
+
+  switch (id) {
+  case PLL_PPLL:
+    pll_con = &pmucru->ppll_con[0];
+    break;
   case PLL_APLLL:
     pll_con = &cru->apll_l_con[0];
     break;
@@ -588,7 +629,7 @@ rk3399_clock_init(
   DEBUG((EFI_D_ERROR, "DPLL = %u\n", rkclk_pll_get_rate(&cru->dpll_con[0])));
   DEBUG((EFI_D_ERROR, "GPLL = %u\n", rkclk_pll_get_rate(&cru->gpll_con[0])));
   DEBUG((EFI_D_ERROR, "NPLL = %u\n", rkclk_pll_get_rate(&cru->npll_con[0])));
-  DEBUG((EFI_D_ERROR, "VPLL = %u\n", rkclk_pll_get_rate(&cru->cpll_con[0])));
+  DEBUG((EFI_D_ERROR, "VPLL = %u\n", rkclk_pll_get_rate(&cru->vpll_con[0])));
 
   rk3399_configure_cpu(APLL_816_MHZ, CPU_CLUSTER_LITTLE);
   rk3399_configure_cpu(APLL_816_MHZ, CPU_CLUSTER_BIG);
@@ -660,6 +701,9 @@ rk3399_clock_init(
                hclk_div << HCLK_PERILP1_DIV_CON_SHIFT |
                HCLK_PERILP1_PLL_SEL_GPLL << HCLK_PERILP1_PLL_SEL_SHIFT);
 
+  /*
+   * EMMC clock.
+   */
   rk_clrsetreg(&cru->clksel_con[21],
                ACLK_EMMC_PLL_SEL_MASK | ACLK_EMMC_DIV_CON_MASK,
                ACLK_EMMC_PLL_SEL_GPLL << ACLK_EMMC_PLL_SEL_SHIFT |
@@ -673,7 +717,186 @@ rk3399_clock_init(
   DEBUG((EFI_D_ERROR, "DPLL = %u\n", rkclk_pll_get_rate(&cru->dpll_con[0])));
   DEBUG((EFI_D_ERROR, "GPLL = %u\n", rkclk_pll_get_rate(&cru->gpll_con[0])));
   DEBUG((EFI_D_ERROR, "NPLL = %u\n", rkclk_pll_get_rate(&cru->npll_con[0])));
-  DEBUG((EFI_D_ERROR, "VPLL = %u\n", rkclk_pll_get_rate(&cru->cpll_con[0])));
+  DEBUG((EFI_D_ERROR, "VPLL = %u\n", rkclk_pll_get_rate(&cru->vpll_con[0])));
+}
+
+static int
+pll_para_config(UINT32 freq_hz, struct pll_div *div)
+{
+  UINT32 ref_khz = OSC_HZ / KHz, refdiv, fbdiv = 0;
+  UINT32 postdiv1, postdiv2 = 1;
+  UINT32 fref_khz;
+  UINT32 diff_khz, best_diff_khz;
+  const UINT32 max_refdiv = 63, max_fbdiv = 3200, min_fbdiv = 16;
+  const UINT32 max_postdiv1 = 7, max_postdiv2 = 7;
+  UINT32 vco_khz;
+  UINT32 freq_khz = freq_hz / KHz;
+
+  if (!freq_hz) {
+    DEBUG((EFI_D_ERROR, "%s: the frequency can't be 0 Hz\n", __func__));
+    return -1;
+  }
+
+  postdiv1 = DIV_ROUND_UP(VCO_MIN_KHZ, freq_khz);
+  if (postdiv1 > max_postdiv1) {
+    postdiv2 = DIV_ROUND_UP(postdiv1, max_postdiv1);
+    postdiv1 = DIV_ROUND_UP(postdiv1, postdiv2);
+  }
+
+  vco_khz = freq_khz * postdiv1 * postdiv2;
+
+  if (vco_khz < VCO_MIN_KHZ || vco_khz > VCO_MAX_KHZ ||
+      postdiv2 > max_postdiv2) {
+    DEBUG((EFI_D_ERROR, "%s: Cannot find out a supported VCO"
+           " for Frequency (%uHz).\n", __func__, freq_hz));
+    return -1;
+  }
+
+  div->postdiv1 = postdiv1;
+  div->postdiv2 = postdiv2;
+
+  best_diff_khz = vco_khz;
+  for (refdiv = 1; refdiv < max_refdiv && best_diff_khz; refdiv++) {
+    fref_khz = ref_khz / refdiv;
+
+    fbdiv = vco_khz / fref_khz;
+    if ((fbdiv >= max_fbdiv) || (fbdiv <= min_fbdiv))
+      continue;
+    diff_khz = vco_khz - fbdiv * fref_khz;
+    if (fbdiv + 1 < max_fbdiv && diff_khz > fref_khz / 2) {
+      fbdiv++;
+      diff_khz = fref_khz - diff_khz;
+    }
+
+    if (diff_khz >= best_diff_khz)
+      continue;
+
+    best_diff_khz = diff_khz;
+    div->refdiv = refdiv;
+    div->fbdiv = fbdiv;
+  }
+
+  if (best_diff_khz > 4 * (MHz/KHz)) {
+    DEBUG((EFI_D_ERROR, "%s: Failed to match output frequency %u, "
+           "difference is %u Hz,exceed 4MHZ\n", __func__, freq_hz,
+           best_diff_khz * KHz));
+    return -1;
+  }
+  return 0;
+}
+
+void
+rk3399_hdcp_set_clk(UINT32 hz)
+{
+  UINT32 div;
+  UINT32 aclk = hz;
+  UINT32 hpclk = hz / 2;
+
+  div = GPLL_HZ / aclk;
+  ASSERT(div - 1 < 32);
+
+  rk_clrsetreg(&cru->clksel_con[42],
+               ACLK_HDCP_PLL_SEL_MASK | ACLK_HDCP_DIV_CON_MASK,
+               ACLK_HDCP_PLL_SEL_GPLL << ACLK_HDCP_PLL_SEL_SHIFT |
+               (div - 1) << ACLK_HDCP_DIV_CON_SHIFT);
+
+  div = GPLL_HZ / hpclk;
+  ASSERT(div - 1 < 32);
+
+  rk_clrsetreg(&cru->clksel_con[43],
+               PCLK_HDCP_DIV_CON_MASK |
+               HCLK_HDCP_DIV_CON_MASK,
+               (div - 1) << PCLK_HDCP_DIV_CON_SHIFT |
+               (div - 1) << HCLK_HDCP_DIV_CON_SHIFT);
+}
+
+void
+rk3399_vio_set_clk(UINT32 hz)
+{
+  UINT32 div;
+  UINT32 aclk = hz;
+  UINT32 pclk = hz / 2;
+
+  div = GPLL_HZ / aclk;
+  ASSERT(div - 1 < 32);
+
+  rk_clrsetreg(&cru->clksel_con[42],
+               ACLK_VIO_PLL_SEL_MASK | ACLK_VIO_DIV_CON_MASK,
+               ACLK_VIO_PLL_SEL_GPLL << ACLK_VIO_PLL_SEL_SHIFT |
+               (div - 1) << ACLK_VIO_DIV_CON_SHIFT);
+
+  div = GPLL_HZ / pclk;
+  ASSERT(div - 1 < 32);
+
+  rk_clrsetreg(&cru->clksel_con[43],
+               PCLK_VIO_DIV_CON_MASK,
+               (div - 1) << PCLK_VIO_DIV_CON_SHIFT);
+}
+
+UINT32
+rk3399_vop_set_clk(UINT32 clk_id, UINT32 hz)
+{
+	struct pll_div vpll_config = {0};
+	int aclk_vop = 400*MHz;
+	int hclk_vop = 100*MHz;
+	int pwm_vop = 100*MHz;
+	void *aclkreg_addr, *dclkreg_addr, *pwmreg_addr;
+	UINT32 div;
+
+	if (clk_id == DCLK_VOP0) {
+		aclkreg_addr = &cru->clksel_con[47];
+		dclkreg_addr = &cru->clksel_con[49];
+		pwmreg_addr = &cru->clksel_con[51];
+	} else {
+		aclkreg_addr = &cru->clksel_con[48];
+		dclkreg_addr = &cru->clksel_con[50];
+		pwmreg_addr = &cru->clksel_con[52];
+	}
+
+	/* vop aclk/hclk source clk: gpll */
+	div = GPLL_HZ / aclk_vop;
+	ASSERT(div - 1 < 32);
+
+	rk_clrsetreg(aclkreg_addr,
+		     ACLK_VOP_PLL_SEL_MASK | ACLK_VOP_DIV_CON_MASK,
+		     ACLK_VOP_PLL_SEL_GPLL << ACLK_VOP_PLL_SEL_SHIFT |
+		     (div - 1) << ACLK_VOP_DIV_CON_SHIFT);
+
+	div = GPLL_HZ / hclk_vop;
+	ASSERT(div - 1 < 32);
+
+	rk_clrsetreg(aclkreg_addr,
+		     HCLK_VOP_DIV_CON_MASK,
+		     (div - 1) << HCLK_VOP_DIV_CON_SHIFT);
+
+	/* vop PWM clk */
+
+	div = GPLL_HZ / pwm_vop;
+	ASSERT(div - 1 < 32);
+
+	rk_clrsetreg(pwmreg_addr,
+		     CLK_VOP_PWM_PLL_SEL_MASK | CLK_VOP_PWM_DIV_CON_MASK,
+		     CLK_VOP_PWM_PLL_SEL_GPLL << CLK_VOP_PWM_PLL_SEL_SHIFT |
+		     (div - 1) << CLK_VOP_PWM_DIV_CON_MASK);
+
+	/* vop dclk source from vpll, and equals to vpll(means div == 1) */
+
+	if (pll_para_config(hz, &vpll_config)) {
+		DEBUG((EFI_D_ERROR, "failed to configure DCLK\n"));
+		ASSERT(0);
+		return -1;
+	}
+
+	rkclk_set_pll(&cru->vpll_con[0], &vpll_config);
+
+	rk_clrsetreg(dclkreg_addr,
+		     DCLK_VOP_DCLK_SEL_MASK | DCLK_VOP_PLL_SEL_MASK|
+		     DCLK_VOP_DIV_CON_MASK,
+		     DCLK_VOP_DCLK_SEL_DIVOUT << DCLK_VOP_DCLK_SEL_SHIFT |
+		     DCLK_VOP_PLL_SEL_VPLL << DCLK_VOP_PLL_SEL_SHIFT |
+		     (1 - 1) << DCLK_VOP_DIV_CON_SHIFT);
+
+	return hz;
 }
 
 UINT32
@@ -682,6 +905,7 @@ rk3399_clk_get_rate(
   )
 {
   switch (id) {
+  case PLL_PPLL:
   case PLL_APLLL:
   case PLL_APLLB:
   case PLL_DPLL:

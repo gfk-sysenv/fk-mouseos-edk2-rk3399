@@ -126,7 +126,7 @@ RkClkGetI2CClk (
   UINT32 Div = 1;
   UINT32 PmuPll;
 
-  PmuPll = rk3399_pll_get_rate(PPLL_ID);
+  PmuPll = rk3399_pll_get_rate(PLL_PPLL);
   if (BusId == 0) {
     Con = PmuCruReadl(PMUCRU_CLKSELS_CON(2));
     Div = ((Con >> 0) & 0x7F) + 1;
