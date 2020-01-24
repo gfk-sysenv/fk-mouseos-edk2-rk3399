@@ -90,8 +90,8 @@ DefinitionBlock ("DSDT.aml", "DSDT", 2, "RKCP  ", "RK3399  ", 3)
 
         Device (COM1)
         {
-            Name (_HID, "HISI0031")                             // _HID: Hardware ID
-            Name (_CID, "8250dw")                               // _CID: Compatible ID
+            Name (_HID, "RKCP8250")                             // _HID: Hardware ID
+            Name (_CID, Package() {"HISI0031", "8250dw"})       // _CID: Compatible ID
             Name (_ADR, FixedPcdGet64(PcdSerialRegisterBase))   // _ADR: Address
             Name (_CRS, ResourceTemplate ()                     // _CRS: Current Resource Settings
             {
