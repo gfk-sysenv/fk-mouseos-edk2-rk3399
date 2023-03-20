@@ -18,7 +18,7 @@ jobs:
 
       - name: Clone EDK2, EDK2-non-osi, and EDK2-platforms
         run: |
-          export WORKSPACE="$(pwd)/build"
+          export WORKSPACE="~/work"
           mkdir $WORKSPACE
           cd $WORKSPACE
           git clone https://github.com/tianocore/edk2.git
@@ -39,7 +39,7 @@ jobs:
         run: |
           export GCC5_AARCH64_PREFIX=aarch64-linux-gnu-
           export PACKAGES_PATH=$WORKSPACE/edk2:$WORKSPACE/edk2-platforms:$WORKSPACE/edk2-non-osi
-          . edk2/edksetup.sh
+          bash $WORKSPACE/edk2/edksetup.sh
 
       - name: Compile BaseTools
         run: make -C $WORKSPACE/edk2/BaseTools
