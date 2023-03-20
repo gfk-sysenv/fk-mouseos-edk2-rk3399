@@ -15,10 +15,9 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential acpica-tools nasm uuid-dev gcc-aarch64-linux-gnu
-
       - name: Clone EDK2, EDK2-non-osi, and EDK2-platforms
         run: |
-          export WORKSPACE="~/work"
+          export WORKSPACE=~/workspace
           mkdir $WORKSPACE
           cd $WORKSPACE
           git clone https://github.com/tianocore/edk2.git
@@ -34,13 +33,11 @@ jobs:
           git checkout 861c200cda1417539d46fe3b1eba2b582fa72cbb
           popd
           git clone https://github.com/andreiw/rk3399-edk2.git edk2-platforms/Platform/Rockchip
-
       - name: Set environment variables
         run: |
           export GCC5_AARCH64_PREFIX=aarch64-linux-gnu-
           export PACKAGES_PATH=$WORKSPACE/edk2:$WORKSPACE/edk2-platforms:$WORKSPACE/edk2-non-osi
-          bash $WORKSPACE/edk2/edksetup.sh
-
+          . $WORKSPACE/edk2/edksetup.sh
       - name: Compile BaseTools
         run: make -C $WORKSPACE/edk2/BaseTools
 
