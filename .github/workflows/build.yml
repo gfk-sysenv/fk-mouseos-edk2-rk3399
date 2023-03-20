@@ -35,6 +35,8 @@ jobs:
           git clone https://github.com/andreiw/rk3399-edk2.git edk2-platforms/Platform/Rockchip
       - name: Set environment variables
         run: |
+          pwd
+          ls -l
           export GCC5_AARCH64_PREFIX=aarch64-linux-gnu-
           export PACKAGES_PATH=$WORKSPACE/edk2:$WORKSPACE/edk2-platforms:$WORKSPACE/edk2-non-osi
           . $WORKSPACE/edk2/edksetup.sh
