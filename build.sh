@@ -19,6 +19,7 @@ mkdir -p edk2-platforms/Platform/Rockchip
 mv Rk3399Pkg edk2-platforms/Platform/Rockchip
 export GCC5_AARCH64_PREFIX=aarch64-linux-gnu-
 export PACKAGES_PATH=$WORKSPACE/edk2:$WORKSPACE/edk2-platforms:$WORKSPACE/edk2-non-osi
+sed -i -e s/"-Werror"/""/g edk2/Conf/tools_def.txt
 . edk2/edksetup.sh
 make -C edk2/BaseTools
 build -a AARCH64 -t GCC5 -p edk2-platforms/Platform/Rockchip/Rk3399Pkg/Rk3399-SDK.dsc -b DEBUG
