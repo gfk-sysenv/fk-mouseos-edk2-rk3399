@@ -15,7 +15,7 @@ git clone https://github.com/tianocore/edk2-platforms.git
 pushd edk2-platforms
 git checkout 861c200cda1417539d46fe3b1eba2b582fa72cbb
 popd
-git clone https://github.com/andreiw/rk3399-edk2.git edk2-platforms/Platform/Rockchip
+mv rk3399-edk2 edk2-platforms/Platform/Rockchip
 export GCC5_AARCH64_PREFIX=aarch64-linux-gnu-
 export PACKAGES_PATH=$WORKSPACE/edk2:$WORKSPACE/edk2-platforms:$WORKSPACE/edk2-non-osi
 . edk2/edksetup.sh
