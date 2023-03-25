@@ -1,6 +1,4 @@
-sudo apt remove git
-sudo apt autoremove
-sudo apt-get install build-essential acpica-tools nasm uuid-dev gcc-aarch64-linux-gnu git
+sudo apt-get install build-essential acpica-tools nasm uuid-dev gcc-aarch64-linux-gnu
 # If you want to use a different workspace, change the target directory below
 export WORKSPACE=~/workspace
 mkdir $WORKSPACE
