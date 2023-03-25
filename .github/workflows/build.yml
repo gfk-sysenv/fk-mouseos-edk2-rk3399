@@ -11,6 +11,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Install required packages
+      - name:  Run build.sh
         run: |
           bash build.sh
