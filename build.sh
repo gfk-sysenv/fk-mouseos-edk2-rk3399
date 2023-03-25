@@ -16,7 +16,7 @@ pushd edk2-platforms
 git checkout 861c200cda1417539d46fe3b1eba2b582fa72cbb
 popd
 mkdir -p edk2-platforms/Platform/Rockchip
-mv Rk3399Pkg edk2-platforms/Platform/Rockchip
+mv Rk3399Pkg edk2-platforms/Platform/Rockchip/Rk3399Pkg
 export GCC5_AARCH64_PREFIX=aarch64-linux-gnu-
 export PACKAGES_PATH=$WORKSPACE/edk2:$WORKSPACE/edk2-platforms:$WORKSPACE/edk2-non-osi
 sed -i -e s/"-Werror"/""/g edk2/Conf/tools_def.txt
