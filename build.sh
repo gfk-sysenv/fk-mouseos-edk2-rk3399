@@ -3,7 +3,7 @@ sudo apt-get install build-essential acpica-tools nasm uuid-dev gcc-aarch64-linu
 export WORKSPACE=~/workspace
 mkdir $WORKSPACE
 cd $WORKSPACE
-git clone https://github.com/tianocore/edk2.git
+git clone --recursive https://github.com/tianocore/edk2.git
 pushd edk2
 git checkout 46f4c9677c615d862649459392f8f55b3e6567c2
 popd
