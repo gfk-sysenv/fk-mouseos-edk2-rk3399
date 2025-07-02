@@ -9,11 +9,12 @@ jobs:
         uses: actions/checkout@v2
         
       # Error: The version '2.x' with architecture 'x64' was not found for Ubuntu 22.04.
-      # - name: Setup Python
-      #   uses: actions/setup-python@v4
-      #   with:
-      #     python-version: '2.x'
-      #     cache: 'pip'
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          # python-version: '2.x'
+          python-version: '3.x'
+          cache: 'pip'
           
       - name:  Run build.sh
         run: |
