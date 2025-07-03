@@ -9,7 +9,7 @@ RUN \
   # sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list.d/debian.sources; \
   # apt update; apt remove git; apt autoremove; \
   # apt install -y git iasl python3-distutils build-essential nasm uuid-dev gcc-aarch64-linux-gnu
-  apt update; apt install -y git vim-tiny tree python2; \
+  apt update; apt install -y git vim-tiny tree python2 python3 python-is-python3; \
   apt install -y build-essential acpica-tools nasm uuid-dev gcc-aarch64-linux-gnu
 
 RUN \
@@ -21,9 +21,11 @@ RUN \
   popd; git clone https://github.com/tianocore/edk2-platforms.git; \
   pushd edk2-platforms; git checkout 861c200cda1417539d46fe3b1eba2b582fa72cbb; \
   popd; git clone https://github.com/andreiw/rk3399-edk2.git edk2-platforms/Platform/Rockchip;
-        
+
+# secrets 模块是从 Python 3.6 开始引入的。请确保你的 Python 版本至少是 3.6 或更高
+# File "/workspace/edk2/BaseTools/BinWrappers/PosixLike/../../Source/Python/build/build.py", line 32, in <module> | ImportError: No module named secrets
 RUN \
-  ln -s /usr/bin/python2 /usr/bin/python; \
+  # ln -s /usr/bin/python2 /usr/bin/python; \
   cd $WORKSPACE; \
   export GCC5_AARCH64_PREFIX=aarch64-linux-gnu-; \
   export PACKAGES_PATH=$WORKSPACE/edk2:$WORKSPACE/edk2-platforms:$WORKSPACE/edk2-non-osi; \
