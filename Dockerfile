@@ -19,6 +19,7 @@ RUN \
   rm -f /usr/bin/sh; ln -s /usr/bin/bash /usr/bin/sh; \ 
   mkdir -p $WORKSPACE; cd $WORKSPACE; \
   bash -c """ \
+  pushd /tmp; popd; \
   git clone $GITHUB/tianocore/edk2.git; \
   pushd edk2; git checkout 46f4c9677c615d862649459392f8f55b3e6567c2; \
   popd; git clone $GITHUB/tianocore/edk2-non-osi.git; \
