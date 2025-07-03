@@ -23,6 +23,7 @@ RUN \
   popd; git clone https://github.com/andreiw/rk3399-edk2.git edk2-platforms/Platform/Rockchip;
         
 RUN \
+  ln -s /usr/bin/python2 /usr/bin/python; \
   cd $WORKSPACE; \
   export GCC5_AARCH64_PREFIX=aarch64-linux-gnu-; \
   export PACKAGES_PATH=$WORKSPACE/edk2:$WORKSPACE/edk2-platforms:$WORKSPACE/edk2-non-osi; \
