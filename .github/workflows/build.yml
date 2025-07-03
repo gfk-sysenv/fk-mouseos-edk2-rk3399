@@ -5,18 +5,101 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-        
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          # Error: The version '2.x' with architecture 'x64' was not found for Ubuntu 22.04.
-          # python-version: '2.x'
-          python-version: '3.x'
-          cache: 'pip'
-          
-      - name:  Run build.sh
-        run: |
-          bash build.sh
-          exit 0
+    - name: Checkout code
+      uses: actions/checkout@v2
+      
+    # - name: Setup Python
+    #   uses: actions/setup-python@v4
+    #   with:
+    #     # Error: The version '2.x' with architecture 'x64' was not found for Ubuntu 22.04.
+    #     # python-version: '2.x'
+    #     python-version: '3.x'
+    #     cache: 'pip'
+    # - name:  Run build.sh
+    #   run: |
+    #     bash build.sh
+    #     exit 0
+
+    - uses: actions/checkout@v3
+    # - uses: https://gitee.com/ci-actions/checkout@v3
+    
+    - name: Setup QEMU
+      # uses: docker/setup-qemu-action@v1
+      uses: docker/setup-qemu-action@v2 #ref docker-baseimage-gui
+      # uses: https://gitee.com/ci-actions/docker-setup-qemu-action@v2
+      with:
+        # https://gitee.com/ci-actions/docker-setup-qemu-action/tree/v2/
+        # image: tonistiigi/binfmt:latest
+        # image: registry.cn-shenzhen.aliyuncs.com/infrasync/tonistiigi-binfmt:latest
+        # platforms: arm,arm64,ppc64le,mips64,s390x
+        platforms: arm,arm64
+
+    - name: Setup Docker Buildx
+      # uses: docker/setup-buildx-action@
+      uses: docker/setup-buildx-action@v2
+      # uses: https://gitee.com/ci-actions/docker-setup-buildx-action@v2
+      with:
+        # driver-opts: network=host
+        # https://gitee.com/ci-actions/docker-setup-buildx-action/tree/v2/
+        # platforms: linux/amd64,linux/arm64
+        # pull-img-err: moby/buildkit:buildx-stable-1
+          # image=moby/buildkit:master
+          # image=registry.cn-shenzhen.aliyuncs.com/infrasync/moby-buildkit:buildx-stable-1
+        driver-opts: |
+          network=host
+
+    - name: Call buildx.sh(build with ali's cache, push)
+      run: |
+        # VARS
+        echo ${{ github.repository_owner }} #infrastlabs
+        echo ${{ github.repository }}
+        echo ${{ secrets.DOCKER_REGISTRY_PW_DOCKERHUB }} #fill not show in log
+        # INFO
+        set +e
+        pwd && ls -l
+        docker version
+        free -h; df -h; ip a |grep inet; uname -a;
+        docker image prune -a -f; df -h
+        set -e
+        # TZ
+        date #view1
+        export TZ=Asia/Shanghai  
+        test -z "$TZ" || echo "${TZ}" | sudo tee /etc/timezone
+        test -z "$TZ" || sudo ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime
+        date #view2 
+
+        docker build -t t1 -f Dockerfile .  
+
+    # - name: Upload
+    #   uses: actions/upload-artifact@v3
+    #   with:
+    #     name: zmooth-edk2
+    #     path: |
+    #       /home/runner/work/rk3399-edk2-build/rk3399-edk2-build/workspace-edk2/edk2-rk3399/workspace/Build/sdm845Pkg/DEBUG_GCC5/FV/RK3399_ZMOOTH_UEFI.fd
+    #     if-no-files-found: ignore
+    # ###############################################
+    - name: create github release
+      id: new_release
+      uses: softprops/action-gh-release@v2 #v2.0.8
+      # if: startsWith(github.ref, 'refs/tags/')
+      with:
+        name: latest
+        tag_name: v25.07
+        make_latest: true
+        token: ${{ github.token }} #Defaults to ${{ github.token }}
+        body: |
+          Automated release-2025 for tag ${{ github.ref }}          
+        # append_body
+        # generate_release_notes
+        draft: false
+        prerelease: false
+        preserve_order: true
+        fail_on_unmatched_files: false
+        # repository:  #Defaults to GITHUB_REPOSITORY env variable
+        # body_path: 
+        # target_commitish
+        # files: ebook.pdf
+        files: |
+          # ebook.pdf
+          # LICENSE
+          workspace-edk2/edk2-rk3399/workspace/Build/sdm845Pkg/DEBUG_GCC5/FV/SDM845PKG_UEFI.fd
